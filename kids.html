@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐰</text></svg>">
+  <title>Nature Lab 🐾 | Fun Predator-Prey Learning for Kids!</title>
+  <meta name="description"
+    content="A fun, interactive way for kids to learn about how rabbits and wolves live together in nature!">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #f0fdf4;
+      --bg-alt: #fef9c3;
+      --bg-panel: #fefce8;
+      --bg-card: rgba(255, 255, 255, 0.92);
+      --bg-glass: rgba(255, 255, 255, 0.7);
+      --border: rgba(0, 0, 0, 0.07);
+      --border-active: rgba(139, 92, 246, 0.3);
+      --prey: #22c55e;
+      --prey-dim: rgba(34, 197, 94, 0.15);
+      --prey-bg: #dcfce7;
+      --predator: #ef4444;
+      --predator-dim: rgba(239, 68, 68, 0.15);
+      --predator-bg: #fee2e2;
+      --traj: #8b5cf6;
+      --equil: #f59e0b;
+      --accent: #8b5cf6;
+      --accent-light: #c4b5fd;
+      --accent-glow: rgba(139, 92, 246, 0.25);
+      --accent-bg: #ede9fe;
+      --text: #1e293b;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --surface-hover: rgba(139, 92, 246, 0.08);
+      --radius: 16px;
+      --radius-sm: 10px;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+      --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Nunito', 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+      height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      font-size: 16px;
+    }
+
+    /* === NAVBAR === */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      height: 62px;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(20px) saturate(1.4);
+      border-bottom: 2px solid var(--border);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .nav-logo {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text);
+      letter-spacing: -0.3px;
+    }
+
+    .nav-logo .icon {
+      font-size: 1.5rem;
+    }
+
+    .nav-logo .tag {
+      font-size: 0.55rem;
+      font-weight: 800;
+      color: #fff;
+      background: linear-gradient(135deg, #f97316, #f59e0b);
+      padding: 3px 8px;
+      border-radius: 6px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 4px;
+      background: rgba(139, 92, 246, 0.06);
+      padding: 4px;
+      border-radius: 14px;
+      border: 1px solid rgba(139, 92, 246, 0.1);
+    }
+
+    .nav-tab {
+      padding: 10px 28px;
+      border-radius: 10px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      font-size: 1.05rem;
+      cursor: pointer;
+      transition: all 0.25s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-tab.active {
+      background: linear-gradient(135deg, var(--accent), #a78bfa);
+      color: #fff;
+      box-shadow: 0 4px 16px var(--accent-glow);
+    }
+
+    .nav-tab:hover:not(.active) {
+      color: var(--accent);
+      background: rgba(139, 92, 246, 0.08);
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-badge {
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.7rem;
+      color: var(--traj);
+      border: 2px solid rgba(139, 92, 246, 0.25);
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-weight: 700;
+      display: none;
+      /* Hidden by default */
+      align-items: center;
+      gap: 6px;
+      background: rgba(139, 92, 246, 0.06);
+    }
+
+    .nav-badge.active {
+      display: flex;
+    }
+
+    .btn-home {
+      padding: 8px 18px;
+      border-radius: 14px;
+      border: 2px solid var(--border);
+      background: #fff;
+      color: var(--text-secondary);
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.25s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-home:hover {
+      background: var(--surface-hover);
+      border-color: var(--accent-light);
+      color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.3;
+      }
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-8px);
+      }
+    }
+
+    @keyframes wiggle {
+
+      0%,
+      100% {
+        transform: rotate(0deg);
+      }
+
+      25% {
+        transform: rotate(-5deg);
+      }
+
+      75% {
+        transform: rotate(5deg);
+      }
+    }
+
+    /* === PAGES === */
+    .page {
+      display: none;
+      width: 100%;
+      height: calc(100vh - 62px);
+      margin-top: 62px;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    /* ===========================================================
+           LEARN PAGE
+           =========================================================== */
+    .learn-page {
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--accent) transparent;
+      background: linear-gradient(180deg, #ecfdf5 0%, #fefce8 30%, #fce7f3 60%, #ede9fe 100%);
+    }
+
+    .hero {
+      position: relative;
+      padding: 80px 0 60px;
+      text-align: center;
+      background: radial-gradient(ellipse at 50% 0%, rgba(139, 92, 246, 0.1), transparent 70%);
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent-light), transparent);
+    }
+
+    .hero-emojis {
+      font-size: 3rem;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    .hero-emojis span:nth-child(1) {
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .hero-emojis span:nth-child(2) {
+      animation: float 3s ease-in-out infinite 0.5s;
+    }
+
+    .hero-emojis span:nth-child(3) {
+      animation: float 3s ease-in-out infinite 1s;
+    }
+
+    .hero h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 3.2rem;
+      font-weight: 900;
+      letter-spacing: -1.5px;
+      line-height: 1.15;
+      margin-bottom: 18px;
+      background: linear-gradient(135deg, #22c55e 0%, #8b5cf6 50%, #ef4444 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      color: var(--text-secondary);
+      max-width: 580px;
+      margin: 0 auto 32px;
+      line-height: 1.8;
+      font-size: 1.15rem;
+      font-weight: 500;
+    }
+
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 34px;
+      border-radius: var(--radius);
+      border: none;
+      background: linear-gradient(135deg, var(--accent), #a78bfa);
+      color: #fff;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.25s;
+      box-shadow: 0 4px 20px var(--accent-glow);
+    }
+
+    .hero-cta:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 8px 30px var(--accent-glow);
+    }
+
+    .learn-content {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 32px 80px;
+    }
+
+    .section {
+      margin-bottom: 56px;
+    }
+
+    .section h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin-bottom: 18px;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section h2 .badge {
+      font-size: 0.6rem;
+      padding: 4px 12px;
+      border-radius: 20px;
+      background: var(--accent-bg);
+      color: var(--accent);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-family: 'Nunito', sans-serif;
+    }
+
+    .section p,
+    .section li {
+      color: var(--text-secondary);
+      line-height: 1.8;
+      font-size: 1.05rem;
+      margin-bottom: 14px;
+      font-weight: 500;
+    }
+
+    .section ul {
+      padding-left: 24px;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 20px 0;
+    }
+
+    .info-card {
+      background: var(--bg-card);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      transition: all 0.25s;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .info-card:hover {
+      border-color: var(--accent-light);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .info-card.prey-card {
+      border-left: 4px solid var(--prey);
+      background: linear-gradient(135deg, #f0fdf4, #fff);
+    }
+
+    .info-card.pred-card {
+      border-left: 4px solid var(--predator);
+      background: linear-gradient(135deg, #fef2f2, #fff);
+    }
+
+    .info-card h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.05rem;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text);
+    }
+
+    .info-card p {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 0;
+    }
+
+    .sym {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 1.1rem;
+    }
+
+    .c-prey {
+      color: var(--prey);
+    }
+
+    .c-pred {
+      color: var(--predator);
+    }
+
+    .eqn-block {
+      background: linear-gradient(135deg, #faf5ff, #f0fdf4);
+      border: 2px solid rgba(139, 92, 246, 0.15);
+      border-radius: var(--radius);
+      padding: 32px;
+      margin: 24px 0;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      align-items: center;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .eqn-label {
+      font-size: 0.75rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 700;
+    }
+
+    .concept-box {
+      background: linear-gradient(135deg, #ede9fe, #faf5ff);
+      border: 2px solid rgba(139, 92, 246, 0.2);
+      border-left: 5px solid var(--accent);
+      border-radius: var(--radius-sm);
+      padding: 20px 24px;
+      margin: 20px 0;
+    }
+
+    .concept-box h4 {
+      font-family: 'Outfit', sans-serif;
+      color: var(--accent);
+      margin-bottom: 8px;
+      font-size: 1rem;
+    }
+
+    .concept-box p {
+      margin-bottom: 0;
+      font-size: 0.95rem;
+    }
+
+    .equil-card {
+      background: linear-gradient(135deg, #fffbeb, #fef3c7);
+      border: 2px solid rgba(245, 158, 11, 0.2);
+      border-radius: var(--radius);
+      padding: 28px;
+      margin: 20px 0;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .equil-card h4 {
+      color: var(--equil);
+      font-family: 'Outfit', sans-serif;
+      margin-bottom: 12px;
+      font-size: 1.05rem;
+    }
+
+    .final-cta {
+      text-align: center;
+      padding: 48px;
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(236, 72, 153, 0.06));
+      border-radius: 24px;
+      border: 2px solid rgba(139, 92, 246, 0.1);
+    }
+
+    .final-cta h2 {
+      justify-content: center;
+      margin-bottom: 14px;
+    }
+
+    /* ===========================================================
+           SIMULATE PAGE
+           =========================================================== */
+    .sim-page {
+      display: none;
+      height: calc(100vh - 62px);
+      overflow: hidden;
+    }
+
+    .sim-page.active {
+      display: grid;
+      grid-template-areas: "sidebar info phase";
+      grid-template-columns: 320px 1fr 1fr;
+      grid-template-rows: 1fr;
+      gap: 0;
+    }
+
+    .info-panel {
+      grid-area: info;
+      display: flex;
+      flex-direction: column;
+      border-right: 2px solid var(--border);
+      background: linear-gradient(180deg, #ecfdf5, #f0fdf4);
+      overflow: hidden;
+      /* Remove resize and max-width so it just takes 50% */
+      min-width: 260px;
+    }
+
+    /* --- Sidebar --- */
+    .sidebar {
+      grid-area: sidebar;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: linear-gradient(180deg, #fefce8, #fff7ed);
+      border-right: 2px solid var(--border);
+      overflow-y: hidden;
+      user-select: none;
+      height: 100%;
+    }
+
+    /* Sidebar Group Container */
+    .sb-group {
+      margin-bottom: 8px;
+    }
+
+    .sb-label {
+      font-size: 0.72rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      margin-bottom: 3px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .sb-label::after {
+      content: '';
+      flex: 1;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent-light), transparent);
+      border-radius: 1px;
+    }
+
+    .param-row {
+      margin-bottom: 3px;
+    }
+
+    .param-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2px;
+    }
+
+    .param-name {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .param-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      background: var(--accent-bg);
+      padding: 2px 8px;
+      border-radius: 6px;
+      color: var(--accent);
+      font-weight: 700;
+      border: 1px solid rgba(139, 92, 246, 0.15);
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      background: linear-gradient(90deg, var(--prey-dim), var(--accent-bg));
+      border-radius: 3px;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      background: linear-gradient(135deg, var(--accent), #a78bfa);
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 1px 4px var(--accent-glow);
+      border: 2px solid #fff;
+      transition: all 0.2s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+      box-shadow: 0 4px 16px var(--accent-glow);
+    }
+
+    .input-pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .input-unit {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .input-unit label {
+      font-size: 0.58rem;
+      color: var(--text-muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .input-unit input[type="number"] {
+      background: #fff;
+      border: 2px solid var(--border);
+      color: var(--text);
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      font-family: 'JetBrains Mono', monospace;
+      outline: none;
+      width: 100%;
+      transition: border-color 0.2s;
+      font-weight: 600;
+    }
+
+    .input-unit input[type="number"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .btn-grid {
+      display: grid;
+      gap: 6px;
+    }
+
+    .btn-grid-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .btn {
+      background: #fff;
+      border: 2px solid var(--border);
+      color: var(--text-secondary);
+      padding: 8px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 700;
+      font-family: 'Nunito', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: all 0.2s;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn:hover {
+      background: var(--surface-hover);
+      color: var(--accent);
+      border-color: var(--accent-light);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #a78bfa);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #7c3aed, var(--accent));
+      color: #fff;
+      border-color: #7c3aed;
+    }
+
+    /* Preset Selector */
+    .preset-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .preset-btn-sel {
+      background: #fff;
+      border: 2px solid var(--border);
+      color: var(--text-secondary);
+      padding: 8px 6px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-align: center;
+      transition: all 0.25s;
+      box-shadow: var(--shadow-sm);
+      font-family: 'Nunito', sans-serif;
+    }
+
+    .preset-btn-sel:hover {
+      background: var(--surface-hover);
+      color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .preset-btn-sel.active {
+      background: linear-gradient(135deg, #ede9fe, #f5f3ff);
+      border-color: var(--accent);
+      color: var(--accent);
+      box-shadow: 0 0 15px var(--accent-glow);
+    }
+
+    .preset-btn-sel .hint {
+      display: block;
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .preset-btn-sel.active .hint {
+      color: var(--accent);
+      opacity: 0.8;
+    }
+
+    /* Info Panel */
+    .info-panel {
+      grid-area: info;
+      display: flex;
+      flex-direction: column;
+      border-right: 2px solid var(--border);
+      background: linear-gradient(180deg, #ecfdf5, #f0fdf4);
+      overflow: hidden;
+      resize: horizontal;
+      min-width: 260px;
+      max-width: 800px;
+    }
+
+    /* Bars & Equil Overlay */
+    .bar-overlay {
+      position: relative;
+      background: transparent;
+      border-bottom: 2px solid var(--border);
+      padding: 14px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      width: 100%;
+    }
+
+    .bar-item {
+      width: 100%;
+    }
+
+    .bar-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+      letter-spacing: 0.5px;
+    }
+
+    .bar-track {
+      height: 10px;
+      background: rgba(0, 0, 0, 0.06);
+      border-radius: 5px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 5px;
+      transition: width 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .fill-prey {
+      background: linear-gradient(90deg, #4ade80, var(--prey));
+      box-shadow: 0 2px 8px var(--prey-dim);
+    }
+
+    .fill-pred {
+      background: linear-gradient(90deg, #f87171, var(--predator));
+      box-shadow: 0 2px 8px var(--predator-dim);
+    }
+
+    .equil-widget {
+      border: 2px solid rgba(245, 158, 11, 0.2);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      background: linear-gradient(135deg, #fffbeb, #fef3c7);
+    }
+
+    .equil-title {
+      font-size: 0.7rem;
+      color: var(--equil);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+
+    .equil-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .equil-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: #b45309;
+      background: rgba(255, 255, 255, 0.7);
+      padding: 6px 10px;
+      border-radius: 6px;
+      text-align: center;
+      font-weight: 700;
+      border: 1px solid rgba(245, 158, 11, 0.15);
+    }
+
+    .equil-desc {
+      font-size: 0.6rem;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: 2px;
+      font-weight: 600;
+    }
+
+    /* --- Phase Panel --- */
+    .phase-panel {
+      grid-area: phase;
+      position: relative;
+      background: #f8fafc;
+      overflow: hidden;
+      border-right: 2px solid var(--border);
+    }
+
+    #canvas-container {
+      width: 100%;
+      height: 100%;
+    }
+
+    .panel-header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(180deg, rgba(248, 250, 252, 0.9) 0%, transparent 100%);
+      z-index: 10;
+    }
+
+    .panel-title {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel-title .indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--traj);
+      box-shadow: 0 0 8px var(--accent-glow);
+    }
+
+    .stability-badge {
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 4px 14px;
+      border-radius: 20px;
+      border: 2px solid var(--traj);
+      color: var(--traj);
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    .panel-footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 10px 16px;
+      background: linear-gradient(0deg, rgba(248, 250, 252, 0.9) 0%, transparent 100%);
+      z-index: 10;
+    }
+
+    .axis-legend {
+      display: flex;
+      gap: 18px;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      font-weight: 700;
+    }
+
+    .axis-legend span {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .axis-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .timeline-panel {
+      flex: 1;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      resize: vertical;
+      min-height: 200px;
+    }
+
+    .tp-header {
+      padding: 10px 18px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .tp-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .tp-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+      line-height: 1.4;
+    }
+
+    .tp-legend {
+      display: flex;
+      gap: 14px;
+      font-size: 0.8rem;
+      flex-shrink: 0;
+      padding-top: 4px;
+      font-weight: 600;
+    }
+
+    .tp-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-secondary);
+    }
+
+    .tp-legend-dot {
+      width: 10px;
+      height: 4px;
+      border-radius: 2px;
+    }
+
+    .chart-wrap {
+      flex: 1;
+      padding: 10px 18px 8px;
+      position: relative;
+      min-height: 0;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: var(--radius-sm);
+      margin: 4px 12px;
+    }
+
+    .chart-wrap canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .chart-axis-y {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: rotate(-90deg) translateX(-50%);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      transform-origin: left center;
+      font-family: 'Nunito', sans-serif;
+      letter-spacing: 1px;
+      font-weight: 800;
+    }
+
+    .chart-axis-x {
+      position: absolute;
+      bottom: 4px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-family: 'Nunito', sans-serif;
+      letter-spacing: 0.5px;
+      font-weight: 800;
+    }
+
+    .tp-footer {
+      padding: 8px 18px 8px;
+      border-top: 2px solid var(--border);
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .insight-chip {
+      font-size: 0.8rem;
+      padding: 6px 14px;
+      border-radius: 20px;
+      background: #fff;
+      border: 2px solid var(--border);
+      color: var(--text-secondary);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .insight-chip .val {
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- === NAVBAR === -->
+  <nav class="navbar">
+    <div class="nav-logo">
+      <span class="icon">🐾</span>
+      <span>NATURE LAB</span>
+      <span class="tag">FOR KIDS</span>
+    </div>
+    <div class="nav-tabs">
+      <button class="nav-tab active" data-tab="learn">📚 Learn!</button>
+      <button class="nav-tab" data-tab="simulate">🎮 Play!</button>
+    </div>
+    <div class="nav-right">
+      <button class="btn-home" onclick="location.href='index.html'">🏠 Menu</button>
+    </div>
+  </nav>
+
+  <!-- ===========================================================
+         LEARN PAGE
+         =========================================================== -->
+  <div class="page learn-page active" id="page-learn">
+    <div class="hero">
+      <div class="hero-emojis">
+        <span>🐰</span>
+        <span>🌿</span>
+        <span>🐺</span>
+      </div>
+      <h1>The Amazing World of<br>Rabbits & Wolves!</h1>
+      <p>Discover how nature keeps everything in balance! Learn why 🐰 rabbits and 🐺 wolves need each other using a
+        super cool math trick called the <strong>Lotka-Volterra equations</strong>!</p>
+      <button class="hero-cta" id="cta-simulate">🎮 Let's Play with the Simulator!</button>
+    </div>
+
+    <div class="learn-content">
+      <div class="section">
+        <h2>🌳 Once Upon a Time in a Forest... <span class="badge">The Story</span></h2>
+        <p>Imagine a beautiful forest full of cute <strong style="color:var(--prey)">🐰 rabbits</strong> and sneaky
+          <strong style="color:var(--predator)">🐺 wolves</strong>. When there are lots of rabbits hopping around, the
+          wolves have plenty of yummy food, so the wolf families grow bigger! 🐺👨‍👩‍👧‍👦
+        </p>
+        <p>But as more wolves hunt, the rabbit numbers go down. 📉 With fewer rabbits to munch on, the wolves get hungry
+          and their numbers drop too. With fewer wolves around, the rabbits can safely have baby bunnies again! 🐰✨ And
+          the whole circle starts over!</p>
+        <div class="concept-box">
+          <h4>💡 Cool Fact!</h4>
+          <p>The 🐺 wolves always trail behind the 🐰 rabbits! When rabbits are everywhere, wolves grow — but by the
+            time the wolves peak, rabbits have already started disappearing! It's like a never-ending game of
+            follow-the-leader! 🏃‍♂️</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>✨ The Magic Formulas! <span class="badge">Math Time</span></h2>
+        <p>In 1925, two clever scientists named <strong>Alfred Lotka</strong> and <strong>Vito Volterra</strong> wrote
+          down special math recipes that show exactly how 🐰 rabbits and 🐺 wolves change over time:</p>
+        <div class="eqn-block">
+          <span class="eqn-label">🐰 How Rabbits Change</span>
+          <div id="eqn-prey" style="font-size:1.4rem;"></div>
+          <span class="eqn-label">🐺 How Wolves Change</span>
+          <div id="eqn-pred" style="font-size:1.4rem;"></div>
+        </div>
+        <p>Here <strong style="color:var(--prey)">x</strong> is how many 🐰 rabbits there are and <strong
+            style="color:var(--predator)">y</strong> is how many 🐺 wolves there are. The Greek letters are like magic
+          dials that control how the animals behave!</p>
+      </div>
+
+      <div class="section">
+        <h2>🎛️ The Magic Dials! <span class="badge">Controls</span></h2>
+        <div class="card-grid">
+          <div class="info-card prey-card">
+            <h3>🐰 <span class="sym c-prey">α</span> Baby Bunny Speed</h3>
+            <p>How fast rabbits have babies when no wolves are around! More babies = more bunnies! 🐰🐰🐰</p>
+          </div>
+          <div class="info-card prey-card">
+            <h3>🐺 <span class="sym c-prey">β</span> Hunting Power</h3>
+            <p>How good wolves are at catching rabbits. Super skilled hunters catch more! 🎯</p>
+          </div>
+          <div class="info-card pred-card">
+            <h3>🐺 <span class="sym c-pred">γ</span> Wolf Hunger Rate</h3>
+            <p>How quickly wolves get hungry without food. Hungry wolves can't survive long! 😰</p>
+          </div>
+          <div class="info-card pred-card">
+            <h3>🐺 <span class="sym c-pred">δ</span> Food → Babies</h3>
+            <p>How well wolves turn their meals into baby wolf pups! Nom nom → 🐺 puppy! 🍽️➡️🐺</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>🔄 The Circle of Life! <span class="badge">How It Works</span></h2>
+        <ul>
+          <li><strong style="color:var(--prey)">Phase 1 🐰📈:</strong> Lots of rabbits hopping around → wolves eat well
+            → wolf families grow bigger!</li>
+          <li><strong style="color:var(--predator)">Phase 2 🐺📈:</strong> Too many wolves! → rabbits getting caught →
+            rabbit numbers crash! 😱</li>
+          <li><strong>Phase 3 📉📉:</strong> Not enough rabbits left → wolves go hungry → wolf numbers drop too</li>
+          <li><strong style="color:var(--prey)">Phase 4 🐰✨:</strong> Few wolves around → rabbits bounce back → the
+            cycle starts again! 🎉</li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <h2>⚖️ The Perfect Balance! <span class="badge">Sweet Spot</span></h2>
+        <p>There's a magical sweet spot where the number of births exactly equals the number of deaths for both 🐰
+          rabbits and 🐺 wolves:</p>
+        <div class="equil-card">
+          <h4>🌟 The Perfect Numbers!</h4>
+          <div id="equil-formula" style="font-size:1.3rem; margin:12px 0;"></div>
+          <p style="color:var(--text-muted); font-size:0.9rem;">Start with exactly these numbers of animals and both
+            populations stay flat forever! Like magic! ✨</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>🌀 The Spinning Dance! <span class="badge">What You'll See</span></h2>
+        <p>In the simulator, you'll see a cool spinning diagram called a <strong>phase space</strong>:</p>
+        <ul>
+          <li><strong style="color:var(--prey)">↔️ Left-Right</strong> = How many 🐰 rabbits</li>
+          <li><strong style="color:var(--predator)">↕️ Up-Down</strong> = How many 🐺 wolves</li>
+          <li><strong style="color:var(--traj)">🟣 Purple trail</strong> = The path the animals follow over time</li>
+        </ul>
+        <p>A happy balanced system traces <strong>beautiful looping circles</strong> around the sweet spot! 🎯</p>
+      </div>
+
+      <div class="section">
+        <h2>✨ Magical Sparkles! <span class="badge">Must See</span></h2>
+        <p>Inside the Play! playground, try clicking the 🌟 <strong>Sparkles!</strong> button! It's one of our
+          favorites.</p>
+        <p>Instead of just a single line, you'll see a tiny swarm of green 🐰 and red 🐺 sparkles following the path.
+          The more animals there are, the more sparkles you'll see! It's like watching a real forest come to life
+          through
+          magic! ✨🌳</p>
+        <div class="concept-box">
+          <h4>🔬 Try This!</h4>
+          <p>Change the starting number of 🐰 rabbits — watch how the circle gets bigger or smaller, but it always spins
+            around the same center point! So cool! 🤩</p>
+        </div>
+      </div>
+
+      <div class="final-cta">
+        <h2>🚀 Ready to Play?!</h2>
+        <p style="color:var(--text-secondary); margin-bottom:20px; font-size:1.05rem;">Jump into the simulator and watch
+          🐰 rabbits and 🐺 wolves come alive!</p>
+        <button class="hero-cta" id="cta-simulate-2">🎮 Open the Playground!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===========================================================
+         SIMULATE PAGE
+         =========================================================== -->
+  <div class="page sim-page" id="page-simulate">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sb-group">
+        <div class="sb-label">🌍 Choose a World</div>
+        <div class="preset-grid" id="preset-selector">
+          <button class="preset-btn-sel active" data-val="balanced">🌿 Happy Forest <span class="hint">Balanced
+              Life</span></button>
+          <button class="preset-btn-sel" data-val="fast">⚡ Speed Run! <span class="hint">Super Fast</span></button>
+          <button class="preset-btn-sel" data-val="unstable">💥 Chaos! <span class="hint">Things Go Wild</span></button>
+          <button class="preset-btn-sel" data-val="starvation">🏜️ Tough Times <span class="hint">Food is
+              Scarce</span></button>
+          <button class="preset-btn-sel" style="grid-column: span 2;" data-val="custom">🎨 Make Your Own!</button>
+        </div>
+      </div>
+
+      <div class="sb-group">
+        <div class="sb-label">🎛️ Magic Dials</div>
+        <div class="param-row">
+          <div class="param-header"><span class="param-name">🐰 Baby Speed <span class="c-prey">(α)</span></span><span
+              class="param-val" id="v-alpha">1.0</span></div>
+          <input type="range" id="p-alpha" min="0.1" max="5" step="0.1" value="1.0">
+        </div>
+        <div class="param-row">
+          <div class="param-header"><span class="param-name">🐺 Hunt Power <span class="c-prey">(β)</span></span><span
+              class="param-val" id="v-beta">0.10</span></div>
+          <input type="range" id="p-beta" min="0.01" max="1" step="0.01" value="0.1">
+        </div>
+        <div class="param-row">
+          <div class="param-header"><span class="param-name">🐺 Hunger Rate <span class="c-pred">(γ)</span></span><span
+              class="param-val" id="v-gamma">1.0</span></div>
+          <input type="range" id="p-gamma" min="0.1" max="5" step="0.1" value="1.0">
+        </div>
+        <div class="param-row">
+          <div class="param-header"><span class="param-name">🐺 Food→Pups <span class="c-pred">(δ)</span></span><span
+              class="param-val" id="v-delta">0.10</span></div>
+          <input type="range" id="p-delta" min="0.01" max="1" step="0.01" value="0.1">
+        </div>
+      </div>
+
+      <div class="sb-group">
+        <div class="sb-label">🐾 Starting Animals</div>
+        <div class="input-pair">
+          <div class="input-unit"><label>🐰 Rabbits (x₀)</label><input type="number" id="init-prey" value="40"></div>
+          <div class="input-unit"><label>🐺 Wolves (y₀)</label><input type="number" id="init-pred" value="9"></div>
+        </div>
+      </div>
+
+      <div class="sb-group">
+        <div class="sb-label">🎬 Control Center</div>
+        <div class="btn-grid btn-grid-2">
+          <button class="btn btn-primary" id="btn-toggle">▶ <span id="btn-label">Go!</span></button>
+          <button class="btn" id="btn-reset">🔄 Start Over!</button>
+        </div>
+        <div class="param-row" style="margin-top:8px;">
+          <div class="param-header"><span class="param-name">⏩ Speed</span><span class="param-val"
+              id="v-speed">1.0x</span></div>
+          <input type="range" id="p-speed" min="0.1" max="5" step="0.1" value="1.0">
+        </div>
+        <div class="btn-grid btn-grid-2">
+          <button class="btn" id="btn-mode">🌟 Sparkles!</button>
+          <button class="btn" id="btn-dim">🌀 3D Spin!</button>
+        </div>
+      </div>
+    </aside>
+
+    <div class="info-panel">
+      <!-- Live Population & Equil Overlay -->
+      <div class="bar-overlay">
+        <div class="bar-item">
+          <div class="bar-label"><span class="c-prey">🐰 Rabbits</span><span class="c-prey" id="stat-prey">40</span>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill fill-prey" id="bar-prey"></div>
+          </div>
+        </div>
+        <div class="bar-item">
+          <div class="bar-label"><span class="c-pred">🐺 Wolves</span><span class="c-pred" id="stat-pred">9</span></div>
+          <div class="bar-track">
+            <div class="bar-fill fill-pred" id="bar-pred"></div>
+          </div>
+        </div>
+        <div class="equil-widget">
+          <div class="equil-title">⚖️ Sweet Spot (Equilibrium)</div>
+          <div class="equil-grid">
+            <div>
+              <div class="equil-val" id="eq-x">x* = 10.0</div>
+              <div class="equil-desc">🐰 Happy Rabbits</div>
+            </div>
+            <div>
+              <div class="equil-val" id="eq-y">y* = 10.0</div>
+              <div class="equil-desc">🐺 Content Wolves</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Timeline -->
+      <div class="timeline-panel">
+        <div class="tp-header">
+          <div>
+            <div class="tp-title">📊 Population Story</div>
+          </div>
+          <div class="tp-legend">
+            <div class="tp-legend-item">
+              <div class="tp-legend-dot" style="background:var(--prey)"></div>🐰 Rabbits
+            </div>
+            <div class="tp-legend-item">
+              <div class="tp-legend-dot" style="background:var(--predator)"></div>🐺 Wolves
+            </div>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="chart-time"></canvas>
+          <div class="chart-axis-y">Population</div>
+          <div class="chart-axis-x">Time →</div>
+        </div>
+        <div class="tp-footer">
+          <div class="insight-chip">⏱ Period: <span class="val" id="chip-period">—</span></div>
+          <div class="insight-chip">🐰 Max Rabbits: <span class="val" id="chip-max-prey">—</span></div>
+          <div class="insight-chip">🐺 Max Wolves: <span class="val" id="chip-max-pred">—</span></div>
+          <div class="insight-chip">🔄 Cycles: <span class="val" id="chip-cycles">0</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phase Orbit -->
+    <main class="phase-panel">
+      <div id="canvas-container"></div>
+      <div class="panel-header">
+        <div class="panel-title">
+          <div class="indicator"></div>
+          🌀 Phase Space
+        </div>
+        <div class="stability-group" style="position: relative;">
+          <div class="stability-badge" id="badge-text" style="cursor: help; position: relative;">🌈 HAPPY BALANCE!</div>
+          <div class="stability-tooltip" id="stability-info"
+            style="position: absolute; bottom: 120%; right: 0; width: 280px; background: #fff; border: 2px solid rgba(0,0,0,0.08); border-radius: 12px; padding: 14px; font-size: 0.9rem; color: #475569; opacity: 0; visibility: hidden; transition: 0.2s; z-index: 100; box-shadow: 0 8px 32px rgba(0,0,0,0.12); pointer-events: none;">
+            <strong style="color: #1e293b; display: block; margin-bottom: 6px;">🤔 What's Happening?</strong>
+            <span id="st-explanation">The 🐰 rabbits and 🐺 wolves are going around and around in perfect circles!
+              Neither group disappears — they're in a happy dance together! 💃🕺</span>
+          </div>
+          <style>
+            .stability-badge:hover+#stability-info {
+              opacity: 1;
+              visibility: visible;
+            }
+          </style>
+        </div>
+      </div>
+
+      <div class="panel-footer">
+        <div class="axis-legend">
+          <span>
+            <div class="axis-dot" style="background:var(--prey)"></div> ↔️ 🐰 Rabbits
+          </span>
+          <span>
+            <div class="axis-dot" style="background:var(--predator)"></div> ↕️ 🐺 Wolves
+          </span>
+          <span>
+            <div class="axis-dot" style="background:var(--traj)"></div> 🟣 Trail
+          </span>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module" src="/kids.js"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        if (!window.katex) return;
+        const r = (tex, el) => { if (el) katex.render(tex, el, { throwOnError: false, displayMode: true }); };
+        r("\\frac{dx}{dt} = \\alpha x - \\beta xy", document.getElementById('eqn-prey'));
+        r("\\frac{dy}{dt} = \\delta xy - \\gamma y", document.getElementById('eqn-pred'));
+        r("x^* = \\frac{\\gamma}{\\delta} \\qquad y^* = \\frac{\\alpha}{\\beta}", document.getElementById('equil-formula'));
+      }, 600);
+    });
+  </script>
+</body>
+
+</html>

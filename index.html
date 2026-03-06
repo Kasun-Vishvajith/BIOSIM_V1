@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐰</text></svg>">
+  <title>Predator-Prey Simulation Portal</title>
+  <style>
+    :root {
+      --kids-primary: #8b5cf6;
+      --kids-bg: #fdf4ff;
+      --kids-text: #1e293b;
+
+      --pro-primary: #0ea5e9;
+      --pro-bg: #0f172a;
+      --pro-text: #f8fafc;
+
+      --transition-speed: 0.6s;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      overflow: hidden;
+      display: flex;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    .panel {
+      flex: 1;
+      /* Both start at 50% */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      transition: flex var(--transition-speed) cubic-bezier(0.25, 1, 0.5, 1);
+      position: relative;
+      cursor: pointer;
+      overflow: hidden;
+      text-decoration: none;
+    }
+
+    /* Container hover semantics */
+    body:has(.panel.kids:hover) .panel.kids {
+      flex: 1.5;
+      /* Expand to 60% */
+    }
+
+    body:has(.panel.kids:hover) .panel.pro {
+      flex: 1;
+      /* Shrink to 40% implicitly, but let flex do the math (1.5 vs 1) -> 60/40 */
+    }
+
+    body:has(.panel.pro:hover) .panel.pro {
+      flex: 1.5;
+    }
+
+    body:has(.panel.pro:hover) .panel.kids {
+      flex: 1;
+    }
+
+    /* Common Content Styles */
+    .content {
+      z-index: 2;
+      text-align: center;
+      padding: 2rem;
+      transition: transform var(--transition-speed) ease;
+    }
+
+    .panel:hover .content {
+      transform: scale(1.05);
+    }
+
+    h2 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      font-weight: 800;
+    }
+
+    p {
+      font-size: 1.2rem;
+      max-width: 400px;
+      margin: 0 auto 2rem auto;
+      opacity: 0.9;
+      line-height: 1.5;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 1rem 2.5rem;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Kids Panel Styles */
+    .panel.kids {
+      background: var(--kids-bg);
+      color: var(--kids-text);
+      /* cute pattern */
+      background-image: radial-gradient(#cbd5e1 2px, transparent 2px);
+      background-size: 30px 30px;
+    }
+
+    .panel.kids h2 {
+      font-family: 'Nunito', sans-serif;
+      color: var(--kids-primary);
+    }
+
+    .panel.kids .btn {
+      background: var(--kids-primary);
+      color: white;
+      border: none;
+    }
+
+    .panel.kids .btn:hover {
+      background: #7c3aed;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+    }
+
+    /* Pro Panel Styles */
+    .panel.pro {
+      background: var(--pro-bg);
+      color: var(--pro-text);
+      border-left: 2px solid rgba(255, 255, 255, 0.1);
+      /* tech grid pattern */
+      background-image: linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    .panel.pro h2 {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--pro-primary);
+      letter-spacing: -1px;
+    }
+
+    .panel.pro .btn {
+      background: transparent;
+      color: var(--pro-primary);
+      border: 2px solid var(--pro-primary);
+    }
+
+    .panel.pro .btn:hover {
+      background: var(--pro-primary);
+      color: var(--pro-bg);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(14, 165, 233, 0.3);
+    }
+
+    .emoji-row {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&family=JetBrains+Mono:wght@700&display=swap"
+    rel="stylesheet">
+</head>
+
+<body>
+
+  <!-- Kids Side -->
+  <a href="kids.html" class="panel kids">
+    <div class="content">
+      <div class="emoji-row">🐰 🌿 🐺</div>
+      <h2>Nature Lab</h2>
+      <p>A fun, interactive world to learn how rabbits and wolves balance the ecosystem!</p>
+      <div class="btn">Play for Kids!</div>
+    </div>
+  </a>
+
+  <!-- Professionals Side -->
+  <a href="pro.html" class="panel pro">
+    <div class="content">
+      <div class="emoji-row">📊 🔬 📉</div>
+      <h2>BioSim Pro</h2>
+      <p>Advanced Lotka-Volterra analytical tools with phase-space and bifurcation analysis.</p>
+      <div class="btn">Launch Simulator</div>
+    </div>
+  </a>
+
+</body>
+
+</html>

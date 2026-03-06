@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐰</text></svg>">
+  <title>BioSim | Learn & Simulate the Predator-Prey Model</title>
+  <meta name="description"
+    content="Interactive educational platform for learning the Lotka-Volterra predator-prey model.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #060a13;
+      --bg-panel: #0c1221;
+      --bg-card: rgba(12, 18, 33, 0.85);
+      --bg-glass: rgba(15, 22, 40, 0.6);
+      --border: rgba(255, 255, 255, 0.06);
+      --border-active: rgba(99, 164, 255, 0.25);
+      --prey: #38bdf8;
+      --prey-dim: rgba(56, 189, 248, 0.15);
+      --predator: #f87171;
+      --predator-dim: rgba(248, 113, 113, 0.15);
+      --traj: #34d399;
+      --equil: #fbbf24;
+      --accent: #6366f1;
+      --accent-glow: rgba(99, 102, 241, 0.3);
+      --text: #e2e8f0;
+      --text-secondary: #94a3b8;
+      --text-muted: #475569;
+      --surface-hover: rgba(255, 255, 255, 0.04);
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+      height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* === NAVBAR === */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      height: 52px;
+      background: rgba(6, 10, 19, 0.92);
+      backdrop-filter: blur(24px) saturate(1.4);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      letter-spacing: -0.3px;
+    }
+
+    .nav-logo .icon {
+      font-size: 1.15rem;
+    }
+
+    .nav-logo .tag {
+      font-size: 0.5rem;
+      font-weight: 700;
+      color: var(--accent);
+      background: rgba(99, 102, 241, 0.12);
+      padding: 2px 6px;
+      border-radius: 4px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 16px;
+      padding: 0;
+      background: transparent;
+    }
+
+    .nav-tab {
+      padding: 6px 16px;
+      border-radius: 0;
+      border: none;
+      border-bottom: 2px solid transparent;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-tab.active {
+      background: transparent;
+      color: #fff;
+      border-bottom-color: var(--accent);
+      box-shadow: none;
+    }
+
+    .nav-tab:hover:not(.active) {
+      color: var(--text-secondary);
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-badge.active {
+      display: flex;
+    }
+
+    .nav-badge .dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--traj);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.3;
+      }
+    }
+
+    .btn-home {
+      padding: 6px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-home:hover {
+      background: rgba(99, 102, 241, 0.12);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    /* === PAGES === */
+    .page {
+      display: none;
+      width: 100%;
+      height: calc(100vh - 52px);
+      margin-top: 52px;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    /* ===========================================================
+           LEARN PAGE
+           =========================================================== */
+    .learn-page {
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--accent) transparent;
+    }
+
+    .hero {
+      position: relative;
+      padding: 80px 0 60px;
+      text-align: center;
+      background: radial-gradient(ellipse at 50% 0%, rgba(99, 102, 241, 0.12), transparent 70%);
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border-active), transparent);
+    }
+
+    .hero h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 3rem;
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #fff 20%, var(--prey) 50%, var(--predator) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      color: var(--text-secondary);
+      max-width: 560px;
+      margin: 0 auto 32px;
+      line-height: 1.7;
+      font-size: 1rem;
+    }
+
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 28px;
+      border-radius: var(--radius);
+      border: none;
+      background: linear-gradient(135deg, var(--accent), #818cf8);
+      color: #fff;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 20px var(--accent-glow);
+    }
+
+    .hero-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px var(--accent-glow);
+    }
+
+    .learn-content {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 0 32px 80px;
+    }
+
+    .section {
+      margin-bottom: 56px;
+    }
+
+    .section h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 18px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section h2 .badge {
+      font-size: 0.55rem;
+      padding: 3px 10px;
+      border-radius: 20px;
+      background: rgba(99, 102, 241, 0.12);
+      color: var(--accent);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .section p,
+    .section li {
+      color: var(--text-secondary);
+      line-height: 1.7;
+      font-size: 0.92rem;
+      margin-bottom: 12px;
+    }
+
+    .section ul {
+      padding-left: 20px;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 20px 0;
+    }
+
+    .info-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      transition: all 0.25s;
+    }
+
+    .info-card:hover {
+      border-color: var(--border-active);
+      transform: translateY(-2px);
+    }
+
+    .info-card h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.95rem;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .info-card p {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin-bottom: 0;
+    }
+
+    .sym {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    .c-prey {
+      color: var(--prey);
+    }
+
+    .c-pred {
+      color: var(--predator);
+    }
+
+    .eqn-block {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      margin: 20px 0;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .eqn-label {
+      font-size: 0.6rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    .concept-box {
+      background: rgba(99, 102, 241, 0.06);
+      border: 1px solid rgba(99, 102, 241, 0.15);
+      border-left: 3px solid var(--accent);
+      border-radius: var(--radius-sm);
+      padding: 16px 20px;
+      margin: 20px 0;
+    }
+
+    .concept-box h4 {
+      font-family: 'Outfit', sans-serif;
+      color: var(--accent);
+      margin-bottom: 6px;
+      font-size: 0.85rem;
+    }
+
+    .concept-box p {
+      margin-bottom: 0;
+      font-size: 0.85rem;
+    }
+
+    .equil-card {
+      background: rgba(251, 191, 36, 0.05);
+      border: 1px solid rgba(251, 191, 36, 0.15);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin: 20px 0;
+      text-align: center;
+    }
+
+    .equil-card h4 {
+      color: var(--equil);
+      font-family: 'Outfit', sans-serif;
+      margin-bottom: 10px;
+      font-size: 0.9rem;
+    }
+
+    .final-cta {
+      text-align: center;
+      padding: 40px;
+      background: radial-gradient(ellipse at center, rgba(99, 102, 241, 0.08), transparent 70%);
+      border-radius: 20px;
+    }
+
+    .final-cta h2 {
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+
+    /* ===========================================================
+           SIMULATE PAGE
+           =========================================================== */
+    .sim-page {
+      display: none;
+      height: calc(100vh - 52px);
+      overflow: hidden;
+    }
+
+    .sim-page.active {
+      display: grid;
+      grid-template-areas: "sidebar info phase";
+      grid-template-columns: 320px 1fr 1fr;
+      grid-template-rows: 1fr;
+      gap: 0;
+    }
+
+    /* --- Sidebar --- */
+    .sidebar {
+      grid-area: sidebar;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      background: var(--bg-panel);
+      border-right: 1px solid var(--border);
+      overflow-y: hidden;
+      user-select: none;
+    }
+
+    .sb-group {
+      margin-bottom: 4px;
+    }
+
+    .sb-label {
+      font-size: 0.75rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 4px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sb-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .param-row {
+      margin-bottom: 4px;
+    }
+
+    .param-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2px;
+    }
+
+    .param-name {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .param-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      background: rgba(0, 0, 0, 0.35);
+      padding: 3px 10px;
+      border-radius: 4px;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 2px;
+      outline: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px;
+      height: 12px;
+      background: var(--accent);
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 0 8px var(--accent-glow);
+    }
+
+    .input-pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .input-unit {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .input-unit label {
+      font-size: 0.55rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .input-unit input[type="number"] {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 6px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      outline: none;
+      width: 100%;
+      transition: border-color 0.2s;
+    }
+
+    .input-unit input[type="number"]:focus {
+      border-color: var(--accent);
+    }
+
+    .btn-grid {
+      display: grid;
+      gap: 5px;
+    }
+
+    .btn-grid-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.15s;
+    }
+
+    .btn:hover {
+      background: var(--surface-hover);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: #818cf8;
+    }
+
+    /* Preset Selector */
+    .preset-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .preset-btn-sel {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      padding: 10px 8px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .preset-btn-sel:hover {
+      background: var(--surface-hover);
+      color: #fff;
+    }
+
+    .preset-btn-sel.active {
+      background: rgba(99, 102, 241, 0.15);
+      border-color: var(--accent);
+      color: #fff;
+      box-shadow: 0 0 15px var(--accent-glow);
+    }
+
+    .preset-btn-sel .hint {
+      display: block;
+      font-size: 0.6rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-top: 2px;
+    }
+
+    .preset-btn-sel.active .hint {
+      color: var(--accent);
+      opacity: 0.8;
+    }
+
+    /* Info Panel for Left layout */
+    .info-panel {
+      grid-area: info;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--border);
+      background: var(--bg-panel);
+      overflow: hidden;
+      min-width: 250px;
+    }
+
+    /* Bars & Equil Overlay */
+    .bar-overlay {
+      position: relative;
+      background: transparent;
+      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .bar-item {
+      width: 100%;
+    }
+
+    .bar-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.7rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      letter-spacing: 0.5px;
+    }
+
+    .bar-track {
+      height: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 3px;
+      transition: width 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .fill-prey {
+      background: linear-gradient(90deg, #0ea5e9, var(--prey));
+      box-shadow: 0 0 10px var(--prey-dim);
+    }
+
+    .fill-pred {
+      background: linear-gradient(90deg, #ef4444, var(--predator));
+      box-shadow: 0 0 10px var(--predator-dim);
+    }
+
+    .equil-widget {
+      border: 1px solid rgba(251, 191, 36, 0.12);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+    }
+
+    .equil-title {
+      font-size: 0.55rem;
+      color: var(--equil);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .equil-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .equil-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--equil);
+      background: rgba(0, 0, 0, 0.25);
+      padding: 5px 8px;
+      border-radius: 4px;
+      text-align: center;
+    }
+
+    .equil-desc {
+      font-size: 0.5rem;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: 2px;
+    }
+
+    /* --- Phase Panel --- */
+    .phase-panel {
+      grid-area: phase;
+      position: relative;
+      background: #000;
+      overflow: hidden;
+      border-right: 1px solid var(--border);
+    }
+
+    #canvas-container {
+      width: 100%;
+      height: 100%;
+    }
+
+    .panel-header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.7) 0%, transparent 100%);
+      z-index: 10;
+    }
+
+    .panel-title {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 0.7rem;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .panel-title .indicator {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--traj);
+    }
+
+    .stability-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.52rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+      border: 1px solid var(--traj);
+      color: var(--traj);
+      background: rgba(0, 0, 0, 0.5);
+    }
+
+    .panel-footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 8px 14px;
+      background: linear-gradient(0deg, rgba(0, 0, 0, 0.7) 0%, transparent 100%);
+      z-index: 10;
+    }
+
+    .axis-legend {
+      display: flex;
+      gap: 16px;
+      font-size: 0.8rem;
+      color: #cbd5e1;
+      font-weight: 600;
+    }
+
+    .axis-legend span {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .axis-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .timeline-panel {
+      flex: 1;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-height: 200px;
+    }
+
+    .tp-header {
+      padding: 8px 16px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .tp-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .tp-subtitle {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+      line-height: 1.4;
+    }
+
+    .tp-legend {
+      display: flex;
+      gap: 12px;
+      font-size: 0.75rem;
+      flex-shrink: 0;
+      padding-top: 2px;
+    }
+
+    .tp-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-secondary);
+    }
+
+    .tp-legend-dot {
+      width: 8px;
+      height: 3px;
+      border-radius: 2px;
+    }
+
+    .chart-wrap {
+      flex: 1;
+      padding: 8px 16px 6px;
+      position: relative;
+      min-height: 0;
+    }
+
+    .chart-wrap canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .chart-axis-y {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: rotate(-90deg) translateX(-50%);
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      transform-origin: left center;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 1px;
+      font-weight: 700;
+      text-shadow: 0 0 4px #000;
+    }
+
+    .chart-axis-x {
+      position: absolute;
+      bottom: 2px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.5px;
+      font-weight: 700;
+      text-shadow: 0 0 4px #000;
+    }
+
+    .tp-footer {
+      padding: 6px 16px 6px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .insight-chip {
+      font-size: 0.7rem;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .insight-chip .val {
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- === NAVBAR === -->
+  <nav class="navbar">
+    <div class="nav-logo">
+      <span class="icon">🧬</span>
+      <span>BIOSIM</span>
+      <span class="tag">EDU</span>
+    </div>
+    <div class="nav-tabs">
+      <button class="nav-tab active" data-tab="learn">📖 Learn</button>
+      <button class="nav-tab" data-tab="simulate">🧪 Simulate</button>
+    </div>
+    <div class="nav-right">
+      <button class="btn-home" onclick="location.href='index.html'">🏠 Menu</button>
+    </div>
+  </nav>
+
+  <!-- ===========================================================
+         LEARN PAGE
+         =========================================================== -->
+  <div class="page learn-page active" id="page-learn">
+    <div class="hero">
+      <h1>The Predator-Prey<br>Ecosystem</h1>
+      <p>Discover how nature balances predator and prey populations through the <strong>Lotka-Volterra
+          equations</strong> one of the most elegant models in mathematical biology.</p>
+      <button class="hero-cta" id="cta-simulate">🧪 Launch Simulator</button>
+    </div>
+
+    <div class="learn-content">
+      <div class="section">
+        <h2>🌍 The Story <span class="badge">Introduction</span></h2>
+        <p>Imagine a forest with <strong style="color:var(--prey)">rabbits</strong> and <strong
+            style="color:var(--predator)">wolves</strong>. When there are many rabbits, wolves have plenty of food, so
+          the wolf population grows. But as more wolves hunt, the rabbit population drops. With fewer rabbits to eat,
+          wolves begin to starve and their numbers fall. With fewer wolves, rabbits can safely reproduce again — and the
+          cycle repeats.</p>
+        <div class="concept-box">
+          <h4>💡 Key Insight</h4>
+          <p>The predator population always <strong>lags behind</strong> the prey. When prey is abundant, predators grow
+            — but by the time they peak, prey has already started declining.</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>📐 The Equations <span class="badge">Core Theory</span></h2>
+        <p>In 1925, mathematicians <strong>Alfred Lotka</strong> and <strong>Vito Volterra</strong> independently
+          discovered a pair of differential equations that capture this behavior:</p>
+        <div class="eqn-block">
+          <span class="eqn-label">Prey Population Change</span>
+          <div id="eqn-prey" style="font-size:1.3rem;"></div>
+          <span class="eqn-label">Predator Population Change</span>
+          <div id="eqn-pred" style="font-size:1.3rem;"></div>
+        </div>
+        <p>Here <strong style="color:var(--prey)">x</strong> is the prey population and <strong
+            style="color:var(--predator)">y</strong> the predator population. The Greek letters are biological
+          parameters.</p>
+      </div>
+
+      <div class="section">
+        <h2>🎛️ The Parameters <span class="badge">Deep Dive</span></h2>
+        <div class="card-grid">
+          <div class="info-card">
+            <h3><span class="sym c-prey">α</span> Prey Growth Rate</h3>
+            <p>How fast prey reproduce without predators.</p>
+          </div>
+          <div class="info-card">
+            <h3><span class="sym c-prey">β</span> Predation Rate</h3>
+            <p>How effectively predators hunt prey.</p>
+          </div>
+          <div class="info-card">
+            <h3><span class="sym c-pred">γ</span> Predator Death Rate</h3>
+            <p>How quickly predators die without food.</p>
+          </div>
+          <div class="info-card">
+            <h3><span class="sym c-pred">δ</span> Conversion Efficiency</h3>
+            <p>How well predators convert prey into offspring.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>🔄 Oscillation Phases <span class="badge">Dynamics</span></h2>
+        <ul>
+          <li><strong style="color:var(--prey)">Phase 1:</strong> Abundant prey → predators growing → prey starts
+            declining</li>
+          <li><strong style="color:var(--predator)">Phase 2:</strong> Predators peak → prey crashing → predators start
+            starving</li>
+          <li><strong>Phase 3:</strong> Both populations low → predators die off</li>
+          <li><strong style="color:var(--prey)">Phase 4:</strong> Predators scarce → prey recovers → cycle restarts</li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <h2>⚖️ Equilibrium <span class="badge">Stability</span></h2>
+        <p>A special point where births exactly balance deaths for both species:</p>
+        <div class="equil-card">
+          <h4>Steady-State Populations</h4>
+          <div id="equil-formula" style="font-size:1.2rem; margin:10px 0;"></div>
+          <p style="color:var(--text-muted); font-size:0.8rem;">Start exactly at these values and both populations
+            remain flat.</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>🌀 Phase Orbits <span class="badge">Visualization</span></h2>
+        <p>In the simulator, the main view is a <strong>phase space diagram</strong>:</p>
+        <ul>
+          <li><strong style="color:var(--prey)">X-axis</strong> = Prey population</li>
+          <li><strong style="color:var(--predator)">Y-axis</strong> = Predator population</li>
+          <li><strong style="color:var(--traj)">Green trajectory</strong> = System path over time</li>
+        </ul>
+        <p>A stable system traces <strong>closed elliptical loops</strong> around the equilibrium.</p>
+      </div>
+
+      <div class="section">
+        <h2>✦ Particle Visualization <span class="badge">Advanced View</span></h2>
+        <p>Beyond the standard trajectory, the ✦ <strong>Particles</strong> mode offers a stochastic look at the
+          ecosystem. This replaces the mathematical point with a dynamic swarm of probabilistic particles.</p>
+        <div class="concept-box">
+          <h4>💡 Density Mapping</h4>
+          <p>The number of particles in the swarm is tied directly to the instantaneous population count. This provides
+            an intuitive visual for the <strong>biological mass</strong> of the system at any point in the cycle, making
+            it easier to see the scale of population booms and crashes.</p>
+        </div>
+        <div class="concept-box">
+          <h4>🔬 Experiment Idea</h4>
+          <p>Try different initial populations - notice the orbit changes size but orbits the same equilibrium center!
+          </p>
+        </div>
+      </div>
+
+      <div class="final-cta">
+        <h2>🚀 Ready to Experiment?</h2>
+        <p style="color:var(--text-secondary); margin-bottom:18px;">Jump into the simulator and watch the theory come
+          alive.</p>
+        <button class="hero-cta" id="cta-simulate-2">🧪 Open Simulation Lab</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===========================================================
+         SIMULATE PAGE
+         =========================================================== -->
+  <div class="page sim-page" id="page-simulate">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sb-group">
+        <div class="sb-label">Environment Presets</div>
+        <div class="preset-grid" id="preset-selector">
+          <button class="preset-btn-sel active" data-val="balanced">Steady State <span
+              class="hint">Oscillation</span></button>
+          <button class="preset-btn-sel" data-val="fast">High Freq <span class="hint">Fast Orbit</span></button>
+          <button class="preset-btn-sel" data-val="unstable">Imbalance <span class="hint">System Decay</span></button>
+          <button class="preset-btn-sel" data-val="starvation">Collapse <span class="hint">Starvation</span></button>
+          <button class="preset-btn-sel" style="grid-column: span 2;" data-val="custom">Custom Configuration</button>
+        </div>
+      </div>
+
+      <div class="sb-group">
+        <div class="sb-label">Model Parameters</div>
+        <div class="param-row">
+          <div class="param-header"><span class="param-name">Growth Rate <span class="c-prey">(α)</span></span><span
+              class="param-val" id="v-alpha">1.0</span></div>
+          <input type="range" id="p-alpha" min="0.1" max="5" step="0.1" value="1.0">
+        </div>
+        <div class="param-row">
+          <div class="param-header"><span class="param-name">Predation <span class="c-prey">(β)</span></span><span
+              class="param-val" id="v-beta">0.10</span></div>
+          <input type="range" id="p-beta" min="0.01" max="1" step="0.01" value="0.1">
+        </div>
+        <div class="param-row">
+          <div class="param-header"><span class="param-name">Death Rate <span class="c-pred">(γ)</span></span><span
+              class="param-val" id="v-gamma">1.0</span></div>
+          <input type="range" id="p-gamma" min="0.1" max="5" step="0.1" value="1.0">
+        </div>
+        <div class="param-row">
+          <div class="param-header"><span class="param-name">Conversion <span class="c-pred">(δ)</span></span><span
+              class="param-val" id="v-delta">0.10</span></div>
+          <input type="range" id="p-delta" min="0.01" max="1" step="0.01" value="0.1">
+        </div>
+      </div>
+
+      <div class="sb-group">
+        <div class="sb-label">Initial Populations</div>
+        <div class="input-pair">
+          <div class="input-unit"><label>Prey (x₀)</label><input type="number" id="init-prey" value="40"></div>
+          <div class="input-unit"><label>Predator (y₀)</label><input type="number" id="init-pred" value="9"></div>
+        </div>
+      </div>
+
+      <div class="sb-group">
+        <div class="sb-label">Simulation Engine</div>
+        <div class="btn-grid btn-grid-2">
+          <button class="btn btn-primary" id="btn-toggle">▶ <span id="btn-label">Start</span></button>
+          <button class="btn" id="btn-reset">↺ Reset</button>
+        </div>
+        <div class="param-row" style="margin-top:8px;">
+          <div class="param-header"><span class="param-name">Time Scale</span><span class="param-val"
+              id="v-speed">1.0x</span></div>
+          <input type="range" id="p-speed" min="0.1" max="5" step="0.1" value="1.0">
+        </div>
+        <div class="btn-grid btn-grid-2">
+          <button class="btn" id="btn-mode">✦ Particles</button>
+          <button class="btn" id="btn-dim">◇ 3D Spiral</button>
+        </div>
+      </div>
+
+      <!-- Moved bars to phase space -->
+
+      <!-- Equil widget moved to overlay -->
+    </aside>
+
+    <div class="info-panel">
+      <!-- Live Population & Equil Overlay -->
+      <div class="bar-overlay">
+        <div class="bar-item">
+          <div class="bar-label"><span class="c-prey">Prey</span><span class="c-prey" id="stat-prey">40</span></div>
+          <div class="bar-track">
+            <div class="bar-fill fill-prey" id="bar-prey"></div>
+          </div>
+        </div>
+        <div class="bar-item">
+          <div class="bar-label"><span class="c-pred">Predator</span><span class="c-pred" id="stat-pred">9</span></div>
+          <div class="bar-track">
+            <div class="bar-fill fill-pred" id="bar-pred"></div>
+          </div>
+        </div>
+        <div class="equil-widget">
+          <div class="equil-title">⚖ Equilibrium Point</div>
+          <div class="equil-grid">
+            <div>
+              <div class="equil-val" id="eq-x">x* = 10.0</div>
+              <div class="equil-desc">Steady Prey</div>
+            </div>
+            <div>
+              <div class="equil-val" id="eq-y">y* = 10.0</div>
+              <div class="equil-desc">Steady Pred</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Timeline -->
+      <div class="timeline-panel">
+        <div class="tp-header">
+          <div>
+            <div class="tp-title">Population Timeline</div>
+          </div>
+          <div class="tp-legend">
+            <div class="tp-legend-item">
+              <div class="tp-legend-dot" style="background:var(--prey)"></div>Prey
+            </div>
+            <div class="tp-legend-item">
+              <div class="tp-legend-dot" style="background:var(--predator)"></div>Predator
+            </div>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="chart-time"></canvas>
+          <div class="chart-axis-y">Population</div>
+          <div class="chart-axis-x">Time →</div>
+        </div>
+        <div class="tp-footer">
+          <div class="insight-chip">⏱ Period: <span class="val" id="chip-period">—</span></div>
+          <div class="insight-chip">📈 Max prey: <span class="val" id="chip-max-prey">—</span></div>
+          <div class="insight-chip">📉 Max pred: <span class="val" id="chip-max-pred">—</span></div>
+          <div class="insight-chip">🔄 Cycles: <span class="val" id="chip-cycles">0</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phase Orbit -->
+    <main class="phase-panel">
+      <div id="canvas-container"></div>
+      <div class="panel-header">
+        <div class="panel-title">
+          <div class="indicator"></div>
+          Phase Space
+        </div>
+        <div class="stability-group" style="position: relative;">
+          <div class="stability-badge" id="badge-text" style="cursor: help; position: relative;">NEUTRALLY STABLE</div>
+          <div class="stability-tooltip" id="stability-info"
+            style="position: absolute; bottom: 120%; right: 0; width: 260px; background: #0c1221; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; font-size: 0.85rem; color: #94a3b8; opacity: 0; visibility: hidden; transition: 0.2s; z-index: 100; box-shadow: 0 8px 32px rgba(0,0,0,0.5); pointer-events: none;">
+            <strong style="color: #fff; display: block; margin-bottom: 4px;">Stability Explanation</strong>
+            <span id="st-explanation">The system orbits the equilibrium point in a closed loop. Populations fluctuate
+              but neither die out nor explode.</span>
+          </div>
+          <style>
+            .stability-badge:hover+#stability-info {
+              opacity: 1;
+              visibility: visible;
+            }
+          </style>
+        </div>
+      </div>
+
+
+
+      <div class="panel-footer">
+        <div class="axis-legend">
+          <span>
+            <div class="axis-dot" style="background:var(--prey)"></div> X-axis: Prey pop.
+          </span>
+          <span>
+            <div class="axis-dot" style="background:var(--predator)"></div> Y-axis: Predator pop.
+          </span>
+          <span>
+            <div class="axis-dot" style="background:var(--traj)"></div> Trajectory path
+          </span>
+        </div>
+      </div>
+    </main>
+
+
+  </div>
+
+  <script type="module" src="/pro.js"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        if (!window.katex) return;
+        const r = (tex, el) => { if (el) katex.render(tex, el, { throwOnError: false, displayMode: true }); };
+        r("\\frac{dx}{dt} = \\alpha x - \\beta xy", document.getElementById('eqn-prey'));
+        r("\\frac{dy}{dt} = \\delta xy - \\gamma y", document.getElementById('eqn-pred'));
+        r("x^* = \\frac{\\gamma}{\\delta} \\qquad y^* = \\frac{\\alpha}{\\beta}", document.getElementById('equil-formula'));
+      }, 600);
+    });
+  </script>
+</body>
+
+</html>
